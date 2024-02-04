@@ -1,3 +1,5 @@
+from abc import ABC
+
 from rest_framework import serializers, validators
 
 from api.models import User, Warehouse, Product, Purchase
@@ -36,13 +38,7 @@ class UserSerializer(serializers.Serializer):
 
 
 class WarehouseSerializer(serializers.Serializer):
-    class Meta:
-        model = Warehouse
-        fields = "__all__"
-        extra_kwargs = {"id": {"read_only": True}}
-
-
-class ProductSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=64, validators=[validators.UniqueValidator(Warehouse.objects.all())])
 
     def update(self, instance, validated_data):
         pass
@@ -50,12 +46,57 @@ class ProductSerializer(serializers.Serializer):
     def create(self, validated_data):
         pass
 
+    # def update(self, instance, validated_data):
+    #     if name := validated_data.get("name"):
+    #         instance.name = name
+    #         instance.save(update_fields=["name"])
+    #     return instance
+    # def create(self, validated_data):
+    #     warehouse = Warehouse.objects.create(
+    #         name=validated_data["name"]
+    #     )
+    #     warehouse.save()
+    #     return warehouse
+
+    class Meta:
+        model = Warehouse
+        fields = "__all__"
+        extra_kwargs = {"id": {"read_only": True}}
+
+
+class ProductSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=64)
+    quantity = serializers.IntegerField()
+    warehouse = Warehouse.objects.get(id=1)
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        product = Product.objects.create(
+            name=validated_data["name"],
+            quantity=validated_data["quantity"],
+            warehouse=validated_data["warehouse"]
+        )
+
+        product.save()
+        return product
+
+
     class Meta:
         model = Product
         fields = "__all__"
         extra_kwargs = {"id": {"read_only": True}}
 
+
 class PurchaseSerializer(serializers.Serializer):
+    product = serializers.CharField(max_length=64, )
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
     class Meta:
         model = Purchase
         fields = "__all__"

@@ -11,11 +11,17 @@ class User(AbstractUser):
 class Warehouse(models.Model):
     name = models.CharField(max_length=64)
 
+    def __str__(self):
+        return f" {self.id}. Склад: {self.name} "
+
 
 class Product(models.Model):
     name = models.CharField(max_length=128)
-    quantity = models.IntegerField()
+    quantity = models.PositiveIntegerField()
     warehouse = models.ForeignKey(Warehouse, related_name="products", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.warehouse.name}. количество:{self.name}"
 
 
 class Purchase(models.Model):
